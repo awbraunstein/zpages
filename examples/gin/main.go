@@ -29,6 +29,6 @@ func main() {
 	}
 	r.GET("/statusz", gin.WrapH(statuszHandler))
 	r.GET("/requestz", gin.WrapH(requestzHandler))
-	log.Println("Listening on %s...", *httpAddr)
+	log.Printf("Listening on %s...", *httpAddr)
 	r.Run(*httpAddr)
 }

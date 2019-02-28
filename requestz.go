@@ -142,6 +142,6 @@ func (h *Requestz) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	}
 	h.mu.RUnlock()
 	if err := h.tmpl.Execute(resp, tmplData); err != nil {
-		log.Println("Unable to execute requestz.tmpl; err=%v", err)
+		log.Printf("Unable to execute requestz.tmpl; err=%v", err)
 	}
 }

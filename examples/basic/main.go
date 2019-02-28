@@ -26,6 +26,6 @@ func main() {
 	}
 	mux.Handle("/statusz", requestzHandler.Middleware(statuszHandler))
 	mux.Handle("/requestz", requestzHandler.Middleware(requestzHandler))
-	log.Println("Listening on %s...", *httpAddr)
+	log.Printf("Listening on %s...", *httpAddr)
 	http.ListenAndServe(*httpAddr, mux)
 }

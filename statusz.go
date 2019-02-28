@@ -60,6 +60,6 @@ func NewStatusz() (*Statusz, error) {
 func (h *Statusz) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	h.data.DynamicData.NumGoroutine = runtime.NumGoroutine()
 	if err := h.tmpl.Execute(resp, h.data); err != nil {
-		log.Println("Unable to execute statusz.tmpl; err=%v", err)
+		log.Printf("Unable to execute statusz.tmpl; err=%v", err)
 	}
 }

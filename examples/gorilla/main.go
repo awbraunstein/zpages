@@ -28,6 +28,6 @@ func main() {
 	}
 	r.Handle("/statusz", statuszHandler)
 	r.Handle("/requestz", requestzHandler)
-	log.Println("Listening on %s...", *httpAddr)
+	log.Printf("Listening on %s...", *httpAddr)
 	http.ListenAndServe(*httpAddr, r)
 }

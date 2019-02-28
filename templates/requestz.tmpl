@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<title>Requestz</title>
+	<script>
+	 function showRequestsDiv(id) {
+	     // Hide all the request divs.
+	     var allRequestDivs = document.getElementsByClassName("requests")
+	     for (var i = 0; i < allRequestDivs.length; i++) {
+		 allRequestDivs[i].style.display = "none";
+	     }
+	     // Show the one we care about.
+	     var div = document.getElementById(id);
+	     div.style.display = "block";
+	 }
+	</script>
+    </head>
+    <body>
+	<h1>Requestz</h1>
+	<div class="requestSelectors">
+	    <ul>
+		{{range $path, $pathData := .RequestsByPath}}
+		    <li>
+			<span>{{$path}}</span>
+			{{range $duration, $reqInfos := $pathData.TimeBuckets}}
+			    <a href="#" onclick="showRequestsDiv('{{$.GetElementId $path $duration ""}}')"><span>{{$.GetDurationString $duration}}({{len $reqInfos}} Requests)</span></a>
+			{{end}}
+			<a href="#" onclick="showRequestsDiv('{{$.GetElementId $path 0 "errors"}}')"><span>Errors({{len $pathData.Errors}} Requests)</span></a>
+		    </li>
+		{{end}}
+	    </ul>
+	</div>
+	<div class="requestViews">
+	    {{define "reqInfo"}}
+	    <li>
+		<p>Timestamp: {{.Timestamp}}</p>
+		<p>Status: {{.Status}}</p>
+		<p>URI: {{.Request.RequestURI}}</p>
+		<p>Remote IP: {{.Request.RemoteAddr}}</p>
+	    </li>
+            {{end}}
+	    {{range $path, $pathData := .RequestsByPath}}
+		{{range $duration, $reqInfos := $pathData.TimeBuckets}}
+		    <div class="requests" id="{{$.GetElementId $path $duration ""}}" style="display: none;">
+			<ul>
+			    {{range $reqInfos}}
+				{{template "reqInfo" .}}
+			    {{end}}
+			</ul>
+		    </div>
+		{{end}}
+		<div class="requests" id="{{$.GetElementId $path 0 "errors"}}" style="display: none;">
+		    <ul>
+			{{range $pathData.Errors}}
+			    {{template "reqInfo" .}}
+			{{end}}
+		    </ul>
+		</div>
+	    {{end}}
+	</div>
+    </body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<title>Statusz</title>
+    </head>
+    <body>
+	<div>
+	    <h2>
+		Go Build Info
+	    </h2>
+	    <ul>
+		<li>
+		    GOARCH: {{.Goarch}}
+		</li>
+		<li>
+		    GOOS: {{.Goos}}
+		</li>
+		<li>
+		    GC: {{.Gc}}
+		</li>
+		<li>
+		    Go Version: {{.GoVersion}}
+		</li>
+		{{with .BuildTime}}
+		    <li>
+			Build Time: {{.}}
+		    </li>
+		{{end}}
+		{{with .CommitHash}}
+		    <li>
+			Commit Hash: {{.}}
+		    </li>
+		{{end}}
+	    </ul>
+	</div>
+	<div>
+	    <h2>
+		Host Info
+	    </h2>
+	    <ul>
+		<li>
+		    Hostname: {{.Hostname}}
+		</li>
+	    </ul>
+	</div>
+	<div>
+	    <h2>
+		OS Environment
+	    </h2>
+	    <ul>
+		{{range $i, $kv := .Environment}}
+		    <li>
+			{{$kv}}
+		    </li>
+		{{end}}
+	    </ul>
+	</div>
+	<div>
+	    <h2>
+		Go Program stats
+	    </h2>
+	    <ul>
+		<li>
+		    # of Goroutines: {{.DynamicData.NumGoroutine}}
+		</li>
+	    </ul>
+	</div>
+
+    </body>
+</html>

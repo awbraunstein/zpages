@@ -74,14 +74,14 @@ func (h *Requestz) addRequest(status int, r *http.Request) {
 }
 
 // Middleware allows for easy chaning of the Middleware handler.
-func (h *Requestz) Middleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (h *Requestz) Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sr := statusRecorder{ResponseWriter: w}
 		next.ServeHTTP(&sr, r)
 		// We don't want to block the request from returning so we are
 		// doing this in a goroutine.
 		go h.addRequest(sr.status, r)
-	}
+	})
 }
 
 // Holds the data for requests for a given path.

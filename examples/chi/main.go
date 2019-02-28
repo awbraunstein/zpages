@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/awbraunstein/zpages"
+	"github.com/go-chi/chi"
 )
 
 var (
@@ -14,18 +15,19 @@ var (
 
 func main() {
 	flag.Parse()
-	mux := http.NewServeMux()
+	r := chi.NewRouter()
 	requestzHandler, err := zpages.NewRequestz()
 	if err != nil {
 		log.Fatalf("Unable to initialize Requestz handler; err=%v", err)
 	}
-	mux.Handle("/healthz", requestzHandler.Middleware(zpages.NewHealthz()))
+	r.Use(requestzHandler.Middleware)
+	r.Handle("/healthz", zpages.NewHealthz())
 	statuszHandler, err := zpages.NewStatusz()
 	if err != nil {
 		log.Fatalf("Unable to initialize Statusz handler; err=%v", err)
 	}
-	mux.Handle("/statusz", requestzHandler.Middleware(statuszHandler))
-	mux.Handle("/requestz", requestzHandler.Middleware(requestzHandler))
+	r.Handle("/statusz", statuszHandler)
+	r.Handle("/requestz", requestzHandler)
 	log.Println("Listening on %s...", *httpAddr)
-	http.ListenAndServe(*httpAddr, mux)
+	http.ListenAndServe(*httpAddr, r)
 }

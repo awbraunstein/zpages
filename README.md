@@ -4,6 +4,12 @@
 
 Go utilities for generating helpful debug and internal pages for server inspection.
 
+## Installation
+
+`go get -u github.com/awbraunstein/zpages`
+
+## Usage
+
 Just add the handlers/middleware that you want and run your server. It is recommended to put these pages behind some sort of internal auth to avoid leaking this information to users.
 ```golang
 func main() {

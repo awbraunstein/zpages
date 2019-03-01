@@ -12,10 +12,13 @@ import (
 	"time"
 )
 
+// Allow for easy mocking of time.Now()
+var timeNow = time.Now
+
 const requestRetention = time.Duration(2) * time.Minute
 
 // requestInfo holds the information of a single request.
-type requestInfo struct {
+type RequestInfo struct {
 	Timestamp time.Time
 	Status    int
 	Request   *http.Request
@@ -23,18 +26,22 @@ type requestInfo struct {
 
 type Requestz struct {
 	tmpl              *template.Template
-	completedRequests []*requestInfo
+	completedRequests []*RequestInfo
+	additionalDataFns []func(*RequestInfo)
 	mu                sync.RWMutex
 }
 
-func NewRequestz() (*Requestz, error) {
+// Create a new Requestz handler. Additional functions can modify the current
+// request's RequestInfo and are run in order.
+func NewRequestz(additionalDataFns ...func(*RequestInfo)) (*Requestz, error) {
 	tmplPath := filepath.Join(os.Getenv("GOPATH"), "src/github.com/awbraunstein/zpages", "templates/requestz.tmpl")
 	tmpl, err := template.ParseFiles(tmplPath)
 	if err != nil {
 		return nil, err
 	}
 	return &Requestz{
-		tmpl: tmpl,
+		tmpl:              tmpl,
+		additionalDataFns: additionalDataFns,
 	}, nil
 }
 
@@ -58,18 +65,28 @@ func (rec *statusRecorder) WriteHeader(code int) {
 func (h *Requestz) addRequest(status int, r *http.Request) {
 	h.mu.Lock()
 	// First try to delete any requests outside of the request retention.
+	foundInBoundRequest := false
 	for i, reqInfo := range h.completedRequests {
-		if time.Since(reqInfo.Timestamp) <= requestRetention {
+		if timeNow().Sub(reqInfo.Timestamp) <= requestRetention {
 			h.completedRequests = h.completedRequests[i:]
+			foundInBoundRequest = true
 			break
 		}
 	}
-	// Then add the request.
-	h.completedRequests = append(h.completedRequests, &requestInfo{
-		Timestamp: time.Now(),
+	if !foundInBoundRequest {
+		// This means that all the completed requests should be tossed.
+		h.completedRequests = nil
+	}
+	ri := &RequestInfo{
+		Timestamp: timeNow(),
 		Status:    status,
 		Request:   r,
-	})
+	}
+	for _, fn := range h.additionalDataFns {
+		fn(ri)
+	}
+	// Then add the request.
+	h.completedRequests = append(h.completedRequests, ri)
 	h.mu.Unlock()
 }
 
@@ -86,8 +103,8 @@ func (h *Requestz) Middleware(next http.Handler) http.Handler {
 
 // Holds the data for requests for a given path.
 type pathData struct {
-	TimeBuckets map[time.Duration][]*requestInfo
-	Errors      []*requestInfo
+	TimeBuckets map[time.Duration][]*RequestInfo
+	Errors      []*RequestInfo
 }
 
 // requestzTmplData holds the data that is required to render the requestz
@@ -121,7 +138,7 @@ func (h *Requestz) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		pd := tmplData.RequestsByPath[path]
 		if pd == nil {
 			tmplData.RequestsByPath[path] = &pathData{
-				TimeBuckets: make(map[time.Duration][]*requestInfo),
+				TimeBuckets: make(map[time.Duration][]*RequestInfo),
 			}
 			pd = tmplData.RequestsByPath[path]
 		}
@@ -130,9 +147,9 @@ func (h *Requestz) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 			// Make sure all the time buckets have an entry, even if
 			// there are no requests in it.
 			if pd.TimeBuckets[tb] == nil {
-				pd.TimeBuckets[tb] = []*requestInfo{}
+				pd.TimeBuckets[tb] = []*RequestInfo{}
 			}
-			if time.Since(reqInfo.Timestamp) < tb {
+			if timeNow().Sub(reqInfo.Timestamp) < tb {
 				pd.TimeBuckets[tb] = append(pd.TimeBuckets[tb], reqInfo)
 			}
 		}

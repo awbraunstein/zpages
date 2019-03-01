@@ -1,6 +1,8 @@
 # zpages
+[![MIT licensed](https://img.shields.io/github/license/awbraunstein/zpages.svg)](LICENSE)
 [![GoDoc](https://godoc.org/github.com/awbraunstein/zpages?status.svg)](https://godoc.org/github.com/awbraunstein/zpages)
 [![Build Status](https://travis-ci.org/awbraunstein/zpages.svg?branch=master)](https://travis-ci.org/awbraunstein/zpages)
+[![Coverage Status](https://img.shields.io/codecov/c/github/awbraunstein/zpages.svg)](https://codecov.io/gh/awbraunstein/zpages)
 
 Go utilities for generating helpful debug and internal pages for server inspection.
 

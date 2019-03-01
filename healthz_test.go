@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func TestHealthzPanics(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("the code did not panic")
+		}
+	}()
+	NewHealthz("too", "many strings")
+}
+
 func TestHealthz(t *testing.T) {
 	tests := []struct {
 		name         string

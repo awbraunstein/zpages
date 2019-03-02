@@ -8,7 +8,10 @@ import (
 )
 
 func TestStatusz(t *testing.T) {
-	handler, err := NewStatusz()
+	handler, err := NewStatusz(func(data map[string]string) {
+		data["TEST"] = "DATA"
+
+	})
 	if err != nil {
 		t.Fatalf("unable to create new statusz handler; err=%v", err)
 	}
@@ -26,5 +29,8 @@ func TestStatusz(t *testing.T) {
 	}
 	if !strings.Contains(string(body), "Statusz") {
 		t.Errorf(`Expected response to contain "Statusz" but didn't`)
+	}
+	if !strings.Contains(string(body), "TEST") {
+		t.Errorf(`Expected response to contain "TEST" but didn't`)
 	}
 }

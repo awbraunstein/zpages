@@ -10,7 +10,7 @@ type Healthz struct {
 	okValue string
 }
 
-// NewHealthz creates a new Healthz http handler. This method accpets either 0
+// NewHealthz creates a new Healthz http handler. This method accepts either 0
 // or 1 params and will panic on any other number of values.
 //
 //  NewHealthz()

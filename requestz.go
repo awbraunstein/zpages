@@ -36,8 +36,8 @@ type Requestz struct {
 	mu                sync.RWMutex
 }
 
-// Create a new Requestz handler. Additional functions can modify the current
-// request's RequestInfo and are run in order.
+// NewRequestz creates a new Requestz handler. Additional functions can modify
+// the current request's RequestInfo and are run in order.
 func NewRequestz(additionalDataFns ...func(*RequestInfo)) (*Requestz, error) {
 	tmplPath := filepath.Join(os.Getenv("GOPATH"), "src/github.com/awbraunstein/zpages", "templates/requestz.tmpl")
 	tmpl, err := template.ParseFiles(tmplPath)

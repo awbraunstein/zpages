@@ -43,13 +43,15 @@ type templateInfo struct {
 	OtherData    map[string]string
 }
 
+// Statusz is a handler that renders the statusz page.
 type Statusz struct {
 	tmpl         *template.Template
 	data         templateInfo
 	dataAdderFns []func(map[string]string)
 }
 
-// Create a new Statusz handler. Passed in functions can add additional data to the rendered template.
+// NewStatusz creates a new Statusz handler. Passed in functions can add
+// additional data to the rendered template.
 func NewStatusz(dataAdderFns ...func(map[string]string)) (*Statusz, error) {
 	tmplPath := filepath.Join(os.Getenv("GOPATH"), "src/github.com/awbraunstein/zpages", "templates/statusz.tmpl")
 	tmpl, err := template.ParseFiles(tmplPath)

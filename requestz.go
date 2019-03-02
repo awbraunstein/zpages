@@ -17,13 +17,14 @@ var timeNow = time.Now
 
 const requestRetention = time.Duration(2) * time.Minute
 
-// requestInfo holds the information of a single request.
+// RequestInfo holds the information of a single request.
 type RequestInfo struct {
 	Timestamp time.Time
 	Status    int
 	Request   *http.Request
 }
 
+// Requestz is an http handler that renders the requestz page.
 type Requestz struct {
 	tmpl              *template.Template
 	completedRequests []*RequestInfo

@@ -13,9 +13,9 @@ type Healthz struct {
 // NewHealthz creates a new Healthz http handler. This method accpets either 0
 // or 1 params and will panic on any other number of values.
 //
-// NewHealthz()
+//  NewHealthz()
 // or
-// NewHealthz("ok")
+//  NewHealthz("ok")
 func NewHealthz(okValue ...string) *Healthz {
 	if len(okValue) > 1 {
 		panic("NewHealthz only accepts 0 or 1 arguments")

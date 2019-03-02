@@ -20,7 +20,10 @@ func main() {
 		log.Fatalf("Unable to initialize Requestz handler; err=%v", err)
 	}
 	mux.Handle("/healthz", requestzHandler.Middleware(zpages.NewHealthz()))
-	statuszHandler, err := zpages.NewStatusz()
+	statuszHandler, err := zpages.NewStatusz(func(data map[string]string) {
+		data["Hello Message"] = "This is a Statusz page."
+
+	})
 	if err != nil {
 		log.Fatalf("Unable to initialize Statusz handler; err=%v", err)
 	}

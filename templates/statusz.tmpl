@@ -2,69 +2,69 @@
 <html>
     <head>
 	<title>Statusz</title>
+	<style>
+	 * {
+	     box-sizing: border-box;
+	 }
+	 .section {
+	     border-radius: 2px;
+	     border: 3px solid #eaeaea;
+	     padding: 2px;
+	     margin: 1px;
+	 }
+	 .column {
+	     float: left;
+	     padding: 10px;
+	 }
+	 .row:after {
+	     content: "";
+	     display: table;
+	     clear: both;
+	 }
+	 .column.left {
+	     width: 50%;
+	     text-align: left;
+	 }
+	 .column.right {
+	     width: 50%;
+	     text-align: right;
+	 }
+	</style>
     </head>
     <body>
-	<div>
-	    <h2>
-		Go Build Info
-	    </h2>
-	    <ul>
-		<li>
-		    GOARCH: {{.Goarch}}
-		</li>
-		<li>
-		    GOOS: {{.Goos}}
-		</li>
-		<li>
-		    GC: {{.Gc}}
-		</li>
-		<li>
-		    Go Version: {{.GoVersion}}
-		</li>
+	<h1>Statusz</h1>
+	<div class="main-info section row">
+	    <div class="column left">
+		<div>Command: <code>{{.Invocation}}</code></div>
+		<div>PID: {{.Pid}}</div>
+		<div>Launched at: {{.LaunchTime}}</div>
+		<div>Runtime: {{.Runtime}}</div>
+		<div>Hostname: {{.Hostname}}</div>
+	    </div>
+	    <div class="column right">
 		{{with .BuildTime}}
-		    <li>
-			Build Time: {{.}}
-		    </li>
+		    <div>Build Time: {{.}}</div>
 		{{end}}
 		{{with .CommitHash}}
-		    <li>
-			Commit Hash: {{.}}
-		    </li>
+		    <div>Commit Hash: {{.}}</div>
 		{{end}}
-	    </ul>
+		<div>Go Version: {{.GoVersion}}</div>
+		<div>GOARCH: {{.Goarch}}</div>
+		<div>GOOS: {{.Goos}}</div>
+		<div>GC: {{.Gc}}</div>
+	    </div>
 	</div>
-	<div>
-	    <h2>
-		Host Info
-	    </h2>
-	    <ul>
-		<li>
-		    Hostname: {{.Hostname}}
-		</li>
-	    </ul>
+	<div class="program-info section row">
+	    <div># of Goroutines: {{.NumGoroutine}}</div>
+	    {{range $tag, $value := .OtherData}}
+		<div>{{$tag}}: {{$value}}</div>
+	    {{end}}
 	</div>
-	<div>
-	    <h2>
-		OS Environment
-	    </h2>
-	    <ul>
-		{{range $i, $kv := .Environment}}
-		    <li>
-			{{$kv}}
-		    </li>
-		{{end}}
-	    </ul>
+	<div class="environment row">
+	    <h3>Environment Variables</h3>
+	    {{range $i, $kv := .Environment}}
+		<div>{{$kv}}</div>
+	    {{end}}
 	</div>
-	<div>
-	    <h2>
-		Go Program stats
-	    </h2>
-	    <ul>
-		<li>
-		    # of Goroutines: {{.DynamicData.NumGoroutine}}
-		</li>
-	    </ul>
-	</div>
-
     </body>
 </html>

@@ -19,9 +19,13 @@ const requestRetention = time.Duration(2) * time.Minute
 
 // RequestInfo holds the information of a single request.
 type RequestInfo struct {
+	// The time that the request was written into the store.
 	Timestamp time.Time
-	Status    int
-	Request   *http.Request
+	// The total time that it took to respond.
+	Duration time.Duration
+	// The http response status code.
+	Status  int
+	Request *http.Request
 }
 
 // Requestz is an http handler that renders the requestz page.
@@ -63,7 +67,7 @@ func (rec *statusRecorder) WriteHeader(code int) {
 	rec.ResponseWriter.WriteHeader(code)
 }
 
-func (h *Requestz) addRequest(status int, r *http.Request) {
+func (h *Requestz) addRequest(status int, totalTime time.Duration, r *http.Request) {
 	h.mu.Lock()
 	// First try to delete any requests outside of the request retention.
 	foundInBoundRequest := false
@@ -80,6 +84,7 @@ func (h *Requestz) addRequest(status int, r *http.Request) {
 	}
 	ri := &RequestInfo{
 		Timestamp: timeNow(),
+		Duration:  totalTime,
 		Status:    status,
 		Request:   r,
 	}
@@ -94,11 +99,13 @@ func (h *Requestz) addRequest(status int, r *http.Request) {
 // Middleware allows for easy chaning of the Middleware handler.
 func (h *Requestz) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := timeNow()
 		sr := statusRecorder{ResponseWriter: w}
 		next.ServeHTTP(&sr, r)
 		// We don't want to block the request from returning so we are
 		// doing this in a goroutine.
-		go h.addRequest(sr.status, r)
+		totalTime := timeNow().Sub(start)
+		go h.addRequest(sr.status, totalTime, r)
 	})
 }
 
